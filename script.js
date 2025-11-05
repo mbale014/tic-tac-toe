@@ -17,3 +17,21 @@ function gameBoard() {
 };
 
 
+// A square represents one square on the board and can have different value
+// null : no marker in the square
+// 'x' or 'o' players marker or players 2 marker
+function Square() {
+    let value = null;
+
+    const addMarker = (player) => {
+        value = player;
+    };
+
+    const getValue = () => value;
+
+    return {
+        addMarker,
+        getValue
+    };
+
+};
