@@ -1,4 +1,4 @@
-function gameBoard() {
+const gameBoard = (function () {
     const columns = 3;
     const rows = 3;
     let board = [];
@@ -13,8 +13,19 @@ function gameBoard() {
     // This method to render our board state 
     const getBoard = () => board;
 
-    return {getBoard, }
-};
+    // To mark a square, first we need to get the column and the row the player marked
+    // Determine if the selected square empty, then set the square value with player marker
+    const markSquare = (row, column, player) => {
+
+        const selectedSquare = board[row][column];
+
+        if (selectedSquare.getValue() !== null) return 'This square has been marked!';
+        else selectedSquare.addMarker(player);
+        
+    };
+
+    return {getBoard, markSquare}
+})();
 
 
 // A square represents one square on the board and can have different value
