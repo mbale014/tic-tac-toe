@@ -8,8 +8,9 @@ const gameBoard = (function () {
         board[i] = [];
         for (let j = 0; j < columns; j++) {
             board[i].push(Square());
-    }
-  }
+        };
+    };
+
     // This method to render our board state 
     const getBoard = () => board;
 
@@ -20,13 +21,21 @@ const gameBoard = (function () {
         const selectedSquare = board[row][column];
 
         if (selectedSquare.getValue() !== null) return 'This square has been marked!';
-        else selectedSquare.addMarker(player);
-        
+        else return selectedSquare.addMarker(player);
+    };
+    
+    // This to display board with square value. Currently used for console logging
+    const printBoard  = () => {
+        const boardWithSquareValues = board.map((row) => row.map((cell) => cell.getValue()));
+        console.log(boardWithSquareValues);
     };
 
-    return {getBoard, markSquare}
+    return {
+        getBoard,
+        markSquare,
+        printBoard
+    }
 })();
-
 
 // A square represents one square on the board and can have different value
 // null : no marker in the square
@@ -56,11 +65,13 @@ function Player(name, marker) {
         myName, 
         myMarker
     };
-}
+};
 
 // displayController will be used for controlling the flow and the state of the game
 
-const displayController = (function(playerOneName = "Player One", playerTwoName = 'Player Two') {
+const displayController = (
+    function (playerOneName = "Player One", playerTwoName = 'Player Two') {
+        
     const board = gameBoard;
 
     const playerOne = Player(playerOneName, 'X');
@@ -69,10 +80,38 @@ const displayController = (function(playerOneName = "Player One", playerTwoName 
     let activePlayer = playerOne;
 
     const switchTurn = () => {
-        activePlayer = (playerOne) ? playerTwo : playerTwo;
-    }
+        activePlayer = (activePlayer === playerOne) ? playerTwo : playerOne;
+    };
 
     const getActivePlayer = () => activePlayer;
 
-    return {switchTurn,  getActivePlayer}
+    const printNewRound = () => {
+        board.printBoard();
+        console.log(`${getActivePlayer().myName()}'s move`);
+    };
+
+    const playRound = (row, column) => {
+        console.log(
+            `${getActivePlayer().myName()}'s mark square on row: ${row} column ${column} `
+        );
+        board.markSquare(row, column, getActivePlayer().myMarker());
+        
+        // This where the logic for game winner check, such as win message //
+        
+        //Switch  player turn
+        switchTurn();
+        printNewRound();
+        
+        
+    };
+
+    printNewRound();
+
+    // For playing on console
+    return {
+        playRound,
+        getActivePlayer
+    };
 })();
+
+const game = displayController;
