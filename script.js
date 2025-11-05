@@ -46,3 +46,33 @@ function Square() {
     };
 
 };
+
+// Player will get different name and marker 
+function Player(name, marker) {
+    const myName = () => name;
+    const myMarker = () => marker;
+
+    return {
+        myName, 
+        myMarker
+    };
+}
+
+// displayController will be used for controlling the flow and the state of the game
+
+const displayController = (function(playerOneName = "Player One", playerTwoName = 'Player Two') {
+    const board = gameBoard;
+
+    const playerOne = Player(playerOneName, 'X');
+    const playerTwo = Player(playerTwoName, 'O');
+
+    let activePlayer = playerOne;
+
+    const switchTurn = () => {
+        activePlayer = (playerOne) ? playerTwo : playerTwo;
+    }
+
+    const getActivePlayer = () => activePlayer;
+
+    return {switchTurn,  getActivePlayer}
+})();
