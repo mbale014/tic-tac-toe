@@ -91,33 +91,41 @@ const displayController = (
         console.log(`${getActivePlayer().myName()}'s move`);
     };
 
+    // This to track the round that had been played by both players
+    // This will be to determinate if the round number has passed a certain number, a winning check will be made
+    let roundCount = 0;
+    
     const playRound = (row, column) => {
         console.log(
             `${getActivePlayer().myName()}'s mark square on row: ${row} column ${column} `
         );
-
+        const msg = board.markSquare(row, column, getActivePlayer().myMarker());
         // Prevent marking on an already marked square, if so, prompt message and return nothing
-        if (board.printBoard()[row][column] !== null) {
+        if (msg === 'This square has been marked!') {
             console.log('This square has been marked!');
             printNewRound();
             return;
         };
-        
-        board.markSquare(row, column, getActivePlayer().myMarker());
+
+        msg;
         
         // This where the logic for game winner check, such as win message //
-        
+        if (roundCount >= 5) {
+            console.log(`Round ${roundCount}`);
+        };
+
         //Switch  player turn
+        roundCount++;
         switchTurn();
         printNewRound();
-        
-        
+
     };
 
     printNewRound();
 
     // For playing on console
     return {
+        roundCount,
         playRound,
         getActivePlayer
     };
