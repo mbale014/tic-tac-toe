@@ -87,7 +87,7 @@ const displayController = (
     const getActivePlayer = () => activePlayer;
 
     const printNewRound = () => {
-        console.log(board.printBoard());
+        console.dir(board.printBoard());
         console.log(`${getActivePlayer().myName()}'s move`);
     };
 
@@ -98,30 +98,36 @@ const displayController = (
     // this is used for console only to get the round count
     const getRoundCount = () => roundCount;
 
+    // To chech winning conditions, first we need to get the state of the board
+    // There will 8 possibilities to win, by creating array index 
+    // Getting the game board flatten and check from the array index there are equality between index 
     const winningCheck = () => {
         const winningCombo = [
-                            [1,0,0,0,1,0,0,0,1], //Diagonal win 1
-                            [0,0,1,0,1,0,1,0,0], //Diagonal win 2
-                            [1,0,0,1,0,0,1,0,0], //Verticlal win 1
-                            [0,1,0,0,1,0,0,1,0], //Vertical win 2
-                            [0,0,1,0,0,1,0,0,1], //Vertical win 3
-                            [1,1,1,0,0,0,0,0,0], //Horizontal win 1
-                            [0,0,0,1,1,1,0,0,0], //Horizontal win 2
-                            [0,0,0,0,0,0,1,1,1]  //Horizontal win 3
-                            ];
+        [0,1,2], [3,4,5], [6,7,8], //rows combo                    
+        [0,3,6], [1,4,7], [2,5,8], //columns combo
+        [0,4,8], [2,4,6]           //Diagonal combo
+        ];
 
-        const playerOneMarker = board.printBoard().flat().map(cell => cell === playerOne.myMarker() ? 1 : 0);
-        const playerTwoMarker = board.printBoard().flat().map(cell => cell === playerTwo.myMarker() ? 1 : 0);
-        
-        for (let i = 0; i < winningCombo.length; i++) {
-            if (winningCombo[i] === playerOneMarker) {
-                return `${playerOne.myName()} wins!`;
-            } else if (winningCombo[i] === playerTwoMarker) {
-                return `${playerTwo.myName()} wins!`;
-            }
+        const flatBoard = board.printBoard().flat();
+        console.log(flatBoard);
+
+        for (const combo of winningCombo) {
+            const [a,b,c] = combo;
+
+            //Check if index a on flatten array is not null
+            //the rest are to check equality between marker 'a' and marker 'b' and 'c'
+            if (flatBoard[a] && (flatBoard[a] === flatBoard[c]) && (flatBoard[a] === flatBoard[b])) {
+                const winnerPlayer = flatBoard[a];
+
+                if (winnerPlayer === playerOne.myMarker()) {
+                    return `${playerOne.myName()}'s Wins!`;
+                } else {
+                    return `${playerTwo.myName()}'s Wins!`;
+                };
+            };
         };
-
-    }
+        return; //No winner outcome, undefined return
+    };
     
     const playRound = (row, column) => {
         console.log(
@@ -153,6 +159,7 @@ const displayController = (
 
     // For playing on console
     return {
+        winningCheck,
         getRoundCount,
         playRound,
         getActivePlayer
