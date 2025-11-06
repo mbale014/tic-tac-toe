@@ -94,6 +94,9 @@ const displayController = (
     // This to track the round that had been played by both players
     // This will be to determinate if the round number has passed a certain number, a winning check will be made
     let roundCount = 0;
+
+    // this is used for console only to get the round count
+    const getRoundCount = () => roundCount;
     
     const playRound = (row, column) => {
         console.log(
@@ -106,8 +109,6 @@ const displayController = (
             printNewRound();
             return;
         };
-
-        msg;
         
         // This where the logic for game winner check, such as win message //
         if (roundCount >= 5) {
@@ -125,7 +126,7 @@ const displayController = (
 
     // For playing on console
     return {
-        roundCount,
+        getRoundCount,
         playRound,
         getActivePlayer
     };
