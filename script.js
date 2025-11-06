@@ -21,13 +21,14 @@ const gameBoard = (function () {
         const selectedSquare = board[row][column];
 
         if (selectedSquare.getValue() !== null) return 'This square has been marked!';
-        else return selectedSquare.addMarker(player);
+        
+        return selectedSquare.addMarker(player);
     };
     
     // This to display board with square value. Currently used for console logging
     const printBoard  = () => {
         const boardWithSquareValues = board.map((row) => row.map((cell) => cell.getValue()));
-        console.log(boardWithSquareValues);
+        return boardWithSquareValues;
     };
 
     return {
@@ -86,7 +87,7 @@ const displayController = (
     const getActivePlayer = () => activePlayer;
 
     const printNewRound = () => {
-        board.printBoard();
+        console.log(board.printBoard());
         console.log(`${getActivePlayer().myName()}'s move`);
     };
 
@@ -94,6 +95,14 @@ const displayController = (
         console.log(
             `${getActivePlayer().myName()}'s mark square on row: ${row} column ${column} `
         );
+
+        // Prevent marking on an already marked square, if so, prompt message and return nothing
+        if (board.printBoard()[row][column] !== null) {
+            console.log('This square has been marked!');
+            printNewRound();
+            return;
+        };
+        
         board.markSquare(row, column, getActivePlayer().myMarker());
         
         // This where the logic for game winner check, such as win message //
