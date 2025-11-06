@@ -97,6 +97,31 @@ const displayController = (
 
     // this is used for console only to get the round count
     const getRoundCount = () => roundCount;
+
+    const winningCheck = () => {
+        const winningCombo = [
+                            [1,0,0,0,1,0,0,0,1], //Diagonal win 1
+                            [0,0,1,0,1,0,1,0,0], //Diagonal win 2
+                            [1,0,0,1,0,0,1,0,0], //Verticlal win 1
+                            [0,1,0,0,1,0,0,1,0], //Vertical win 2
+                            [0,0,1,0,0,1,0,0,1], //Vertical win 3
+                            [1,1,1,0,0,0,0,0,0], //Horizontal win 1
+                            [0,0,0,1,1,1,0,0,0], //Horizontal win 2
+                            [0,0,0,0,0,0,1,1,1]  //Horizontal win 3
+                            ];
+
+        const playerOneMarker = board.printBoard().flat().map(cell => cell === playerOne.myMarker() ? 1 : 0);
+        const playerTwoMarker = board.printBoard().flat().map(cell => cell === playerTwo.myMarker() ? 1 : 0);
+        
+        for (let i = 0; i < winningCombo.length; i++) {
+            if (winningCombo[i] === playerOneMarker) {
+                return `${playerOne.myName()} wins!`;
+            } else if (winningCombo[i] === playerTwoMarker) {
+                return `${playerTwo.myName()} wins!`;
+            }
+        };
+
+    }
     
     const playRound = (row, column) => {
         console.log(
@@ -111,7 +136,9 @@ const displayController = (
         };
         
         // This where the logic for game winner check, such as win message //
-        if (roundCount >= 5) {
+        if (roundCount >= 4) {
+            const winMessage = winningCheck();
+            console.log(winMessage);
             console.log(`Round ${roundCount}`);
         };
 
