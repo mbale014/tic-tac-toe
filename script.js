@@ -144,8 +144,16 @@ const displayController = (
         // This where the logic for game winner check, such as win message //
         if (roundCount >= 4) {
             const winMessage = winningCheck();
-            console.log(winMessage);
             console.log(`Round ${roundCount}`);
+            // this is to check ties condition
+            // A game on round >= 8 and winningCheck return no winner, this means ties and games over
+            if (roundCount >= 8 && winMessage === undefined) {
+                return 'Draw!';
+            };
+
+            if (winMessage !== undefined)  {
+                return winMessage;
+            }
         };
 
         //Switch  player turn
