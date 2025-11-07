@@ -187,6 +187,6 @@ for (let i = 0; i < 9; i++) {
 boardGame.addEventListener('click', (e) => {
     if (!e.target.classList.contains('square-cell')) return;
 
-    
+    e.target.innerText = 'X'
 
 })
