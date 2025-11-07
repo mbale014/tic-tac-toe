@@ -1,4 +1,4 @@
-const gameBoard = (function () {
+/* const gameBoard = (function () {
     const columns = 3;
     const rows = 3;
     let board = [];
@@ -68,9 +68,9 @@ function Player(name, marker) {
     };
 };
 
-// displayController will be used for controlling the flow and the state of the game
+// gameController will be used for controlling the flow and the state of the game
 
-const displayController = (
+const gameController = (
     function (playerOneName = "Player One", playerTwoName = 'Player Two') {
         
     const board = gameBoard;
@@ -174,4 +174,19 @@ const displayController = (
     };
 })();
 
-const game = displayController;
+const game = gameController; */
+
+const boardGame = document.querySelector('.game-board');
+
+for (let i = 0; i < 9; i++) {
+    const squareCell = document.createElement('div');
+    squareCell.classList.add('square-cell');
+    boardGame.appendChild(squareCell)
+}
+
+boardGame.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('square-cell')) return;
+
+    
+
+})
