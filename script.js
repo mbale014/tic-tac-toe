@@ -1,4 +1,4 @@
-/* const gameBoard = (function () {
+const gameBoard = (function () {
     const columns = 3;
     const rows = 3;
     let board = [];
@@ -174,19 +174,39 @@ const gameController = (
     };
 })();
 
-const game = gameController; */
 
-const boardGame = document.querySelector('.game-board');
+// To control the screen by modify dom, we use IIFE as module pattern
+const screenController = (function(doc) {
+    const game = gameController;
+    const gameBoardDiv = doc.querySelector('.game-board');
 
-for (let i = 0; i < 9; i++) {
-    const squareCell = document.createElement('div');
-    squareCell.classList.add('square-cell');
-    boardGame.appendChild(squareCell)
-}
+    const updateScreen = () => {
+        for (let i = 0; i < 9; i++) {
+            const squareCell = doc.createElement('div');
+            squareCell.classList.add('square-cell');
+            gameBoardDiv.appendChild(squareCell);
+        };
+    };
 
-boardGame.addEventListener('click', (e) => {
-    if (!e.target.classList.contains('square-cell')) return;
+    const clickBoardHandler = () => {
+        gameBoardDiv.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('square-cell')) return;
 
-    e.target.innerText = 'X'
+            game.playRound()
+            e.target.innerText = 'X'
+        })
+    };
 
-})
+    return {
+        updateScreen,
+        clickBoardHandler
+    };
+
+})(document);
+
+screenController.updateScreen();
+screenController.clickBoardHandler()
+
+
+
+
