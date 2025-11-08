@@ -64,8 +64,26 @@ function Player(name, marker) {
 
     return {
         myName, 
-        myMarker
+        myMarker,
     };
+};
+
+// This to control player score (and ties)
+function Score(player) {
+    const myName = () => player;
+
+    let myScore = 0;
+
+    const getMyScore = () => myScore;
+    const addScore = () => myScore++;
+    const resetScore = () => myScore = 0;
+
+    return {
+        myName,
+        getMyScore,
+        addScore,
+        resetScore
+    }
 };
 
 // gameController will be used for controlling the flow and the state of the game
@@ -77,6 +95,9 @@ const gameController = (
 
     const playerOne = Player(playerOneName, 'X');
     const playerTwo = Player(playerTwoName, 'O');
+    const playerOneScore = Score(playerOne.myName());
+    const playerTwoScore = Score(playerTwo.myName());
+    const tiesScore = Score('ties');
 
     let activePlayer = playerOne;
 
@@ -120,8 +141,10 @@ const gameController = (
                 const winnerPlayer = flatBoard[a];
 
                 if (winnerPlayer === playerOne.myMarker()) {
+                    playerOneScore.addScore();
                     return `${playerOne.myName()}'s Wins!`;
                 } else {
+                    playerTwoScore.addScore();
                     return `${playerTwo.myName()}'s Wins!`;
                 };
             };
@@ -136,9 +159,8 @@ const gameController = (
         const msg = board.markSquare(row, column, getActivePlayer().myMarker());
         // Prevent marking on an already marked square, if so, prompt message and return nothing
         if (msg === 'This square has been marked!') {
-            console.log('This square has been marked!');
             printNewRound();
-            return;
+            return msg;
         };
         
         // This where the logic for game winner check, such as win message //
@@ -148,6 +170,7 @@ const gameController = (
             // this is to check ties condition
             // A game on round >= 8 and winningCheck return no winner, this means ties and games over
             if (roundCount >= 8 && winMessage === undefined) {
+                tiesScore.addOne();
                 return 'Draw!';
             };
 
@@ -167,10 +190,15 @@ const gameController = (
 
     // For playing on console
     return {
-        winningCheck,
         getRoundCount,
         playRound,
-        getActivePlayer
+        getActivePlayer,
+        getBoard: board.getBoard,
+        getScore: {
+            playerOne : playerOneScore.getMyScore(),
+            playerTwo: playerTwoScore.getMyScore(),
+            tiesScore: tiesScore.getMyScore()
+        } 
     };
 })();
 
@@ -179,32 +207,60 @@ const gameController = (
 const screenController = (function(doc) {
     const game = gameController;
     const gameBoardDiv = doc.querySelector('.game-board');
+    const messageDiv = doc.querySelector('.game-message');
+    const playerOneScoreSpan = doc.querySelector('.player-one > span');
+    const playerTwoScoreSpan = doc.querySelector('.player-two > span');
+    const tiesScoreSpan = doc.querySelector('.ties > span');
 
     const updateScreen = () => {
-        for (let i = 0; i < 9; i++) {
-            const squareCell = doc.createElement('div');
-            squareCell.classList.add('square-cell');
-            gameBoardDiv.appendChild(squareCell);
-        };
+        //clear the board
+        gameBoardDiv.innerText = "";
+
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        //Display player's turn
+        messageDiv.innerText = `${activePlayer.myName()}'s move`;
+
+        // Set player score board
+        playerOneScoreSpan.innerText = game.getScore.playerOne;
+        playerTwoScoreSpan.innerText = game.getScore.playerTwo;
+        tiesScoreSpan.innerText = game.getScore.tiesScore;
+
+        board.forEach((row, idxRow) => {
+            row.forEach((square, idxCol) => {
+                const squareDiv = doc.createElement('div');
+                squareDiv.classList.add('square-cell');
+
+                squareDiv.dataset.row = idxRow;
+                squareDiv.dataset.column = idxCol;
+                squareDiv.innerText = square.getValue();
+                gameBoardDiv.appendChild(squareDiv);
+            });
+        });
+
     };
 
     const clickBoardHandler = () => {
         gameBoardDiv.addEventListener('click', (e) => {
             if (!e.target.classList.contains('square-cell')) return;
 
-            game.playRound()
-            e.target.innerText = 'X'
+            const selectedRow = e.target.dataset.row;
+            const selectedColumn = e.target.dataset.column;
+
+            game.playRound(selectedRow, selectedColumn);
+            updateScreen();
         })
     };
 
+    updateScreen();
+
     return {
-        updateScreen,
         clickBoardHandler
     };
 
 })(document);
 
-screenController.updateScreen();
 screenController.clickBoardHandler()
 
 
