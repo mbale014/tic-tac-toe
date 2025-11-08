@@ -75,7 +75,7 @@ function Score(player) {
     let myScore = 0;
 
     const getMyScore = () => myScore;
-    const addScore = () => myScore++;
+    const addScore = () => parseInt(myScore)++;
     const resetScore = () => myScore = 0;
 
     return {
@@ -95,8 +95,8 @@ const gameController = (
 
     const playerOne = Player(playerOneName, 'X');
     const playerTwo = Player(playerTwoName, 'O');
-    const playerOneScore = Score(playerOne.myName());
-    const playerTwoScore = Score(playerTwo.myName());
+    const playerOneScore = Score(playerOneName);
+    const playerTwoScore = Score(playerTwoName);
     const tiesScore = Score('ties');
 
     let activePlayer = playerOne;
@@ -151,6 +151,8 @@ const gameController = (
         };
         return; //No winner outcome, undefined return
     };
+
+    let isGameOver = false;
     
     const playRound = (row, column) => {
         console.log(
@@ -188,17 +190,16 @@ const gameController = (
 
     printNewRound();
 
-    // For playing on console
     return {
         getRoundCount,
         playRound,
         getActivePlayer,
         getBoard: board.getBoard,
         getScore: {
-            playerOne : playerOneScore.getMyScore(),
-            playerTwo: playerTwoScore.getMyScore(),
-            tiesScore: tiesScore.getMyScore()
-        } 
+            playerOne : playerOneScore.getMyScore,
+            playerTwo: playerTwoScore.getMyScore,
+            tiesScore: tiesScore.getMyScore,
+        },
     };
 })();
 
@@ -206,6 +207,7 @@ const gameController = (
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
     const game = gameController;
+
     const gameBoardDiv = doc.querySelector('.game-board');
     const messageDiv = doc.querySelector('.game-message');
     const playerOneScoreSpan = doc.querySelector('.player-one > span');
@@ -223,9 +225,9 @@ const screenController = (function(doc) {
         messageDiv.innerText = `${activePlayer.myName()}'s move`;
 
         // Set player score board
-        playerOneScoreSpan.innerText = game.getScore.playerOne;
-        playerTwoScoreSpan.innerText = game.getScore.playerTwo;
-        tiesScoreSpan.innerText = game.getScore.tiesScore;
+        playerOneScoreSpan.innerText = game.getScore.playerOne();
+        playerTwoScoreSpan.innerText = game.getScore.playerTwo();
+        tiesScoreSpan.innerText = game.getScore.tiesScore();
 
         board.forEach((row, idxRow) => {
             row.forEach((square, idxCol) => {
