@@ -30,10 +30,19 @@ const gameBoard = (function () {
         return boardWithSquareValues;
     };
 
+    const resetBoard = () => {
+        board.forEach((row, idxRow) => {
+            row.forEach((value, idxCol) => {
+                board[idxRow][idxCol].resetSquare();
+            });
+        })
+    };
+
     return {
         getBoard,
         markSquare,
-        printBoard
+        printBoard,
+        resetBoard
     }
 })();
 
@@ -49,9 +58,12 @@ function Square() {
 
     const getValue = () => value;
 
+    const resetSquare = () => value = null;
+
     return {
         addMarker,
-        getValue
+        getValue,
+        resetSquare
     };
 
 };
@@ -185,6 +197,22 @@ const gameController = (
         printNewRound();
 
     };
+    
+    // To reset board, we need to set everthing to zero or null
+    // This include delete mark on board, player's score, set active player to default, and rounc to zero
+    const resetBoard = () => {
+        board.resetBoard(); // reset board
+
+        const scoreList = [playerOneScore,playerTwoScore, tiesScore]
+        for (let scoreItem of scoreList) {
+            scoreItem.resetScore();
+        }; // reset scores
+        activePlayer = playerOne; //set active player to default
+        roundCount = 0 //set round to 0
+
+        printNewRound(); //Round detail checks
+
+    };
 
     printNewRound();
 
@@ -198,6 +226,7 @@ const gameController = (
             playerTwo: playerTwoScore.getMyScore,
             tiesScore: tiesScore.getMyScore,
         },
+        resetBoard,
     };
 })();
 
@@ -223,8 +252,9 @@ const screenController = (function(doc) {
         //Display player's turn
         messageDiv.innerText = `${activePlayer.myName()}'s move`;
         if (gameOverMsg !== undefined) {
+            gameOverMsg += ' Play again?';
             messageDiv.innerText = gameOverMsg;
-        }
+        };
 
         // Set player score board
         playerOneScoreSpan.innerText = game.getScore.playerOne();
@@ -264,15 +294,26 @@ const screenController = (function(doc) {
 
     };
 
+    function resetScreen() {
+        const restartBtn = doc.querySelector('.restart');
+        restartBtn.addEventListener('click', () => {
+            game.resetBoard()
+            updateScreen();
+        });
+        
+    };
+
     updateScreen();
 
     return {
-        clickBoardHandler
+        clickBoardHandler,
+        resetScreen
     };
 
 })(document);
 
 screenController.clickBoardHandler()
+screenController.resetScreen()
 
 
 
