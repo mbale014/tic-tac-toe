@@ -250,11 +250,12 @@ const screenController = (function(doc) {
         const activePlayer = game.getActivePlayer();
 
         //Display player's turn
-        messageDiv.innerText = `${activePlayer.myName()}'s move`;
         if (gameOverMsg !== undefined) {
-            gameOverMsg += ' Play again?';
             messageDiv.innerText = gameOverMsg;
-        };
+        } else {
+            messageDiv.innerText = `${activePlayer.myName()}'s (${activePlayer.myMarker()}) move`;
+        }
+        
 
         // Set player score board
         playerOneScoreSpan.innerText = game.getScore.playerOne();
@@ -297,8 +298,12 @@ const screenController = (function(doc) {
     function resetScreen() {
         const restartBtn = doc.querySelector('.restart');
         restartBtn.addEventListener('click', () => {
-            game.resetBoard()
-            updateScreen();
+            if (confirm('Are you sure you want to restart?')) {
+                game.resetBoard();
+                gameOverMsg = undefined;
+                updateScreen();
+            }
+            
         });
         
     };
