@@ -241,6 +241,7 @@ const screenController = (function(doc) {
     const playerOneScoreSpan = doc.querySelector('.player-one > span');
     const playerTwoScoreSpan = doc.querySelector('.player-two > span');
     const tiesScoreSpan = doc.querySelector('.ties > span');
+    const dialogWindow = doc.querySelector('.game-dialog');
 
     const updateScreen = () => {
         //clear the board
@@ -285,6 +286,7 @@ const screenController = (function(doc) {
 
             const msg = game.playRound(selectedRow, selectedColumn);
             messageRoundController(msg)
+            dialogWindow.showModal()
             updateScreen();
         })
     };
