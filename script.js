@@ -21,8 +21,7 @@ const gameBoard = (function () {
         const selectedSquare = board[row][column];
 
         if (selectedSquare.getValue() !== null) return 'This square has been marked!';
-        
-        return selectedSquare.addMarker(player);
+        else return selectedSquare.addMarker(player);
     };
     
     // This to display board with square value. Currently used for console logging
@@ -75,7 +74,7 @@ function Score(player) {
     let myScore = 0;
 
     const getMyScore = () => myScore;
-    const addScore = () => parseInt(myScore)++;
+    const addScore = () => myScore++;
     const resetScore = () => myScore = 0;
 
     return {
@@ -161,6 +160,7 @@ const gameController = (
         const msg = board.markSquare(row, column, getActivePlayer().myMarker());
         // Prevent marking on an already marked square, if so, prompt message and return nothing
         if (msg === 'This square has been marked!') {
+            console.log(msg);
             printNewRound();
             return msg;
         };
@@ -172,7 +172,7 @@ const gameController = (
             // this is to check ties condition
             // A game on round >= 8 and winningCheck return no winner, this means ties and games over
             if (roundCount >= 8 && winMessage === undefined) {
-                tiesScore.addOne();
+                tiesScore.addScore();
                 return 'Draw!';
             };
 
@@ -250,10 +250,17 @@ const screenController = (function(doc) {
             const selectedRow = e.target.dataset.row;
             const selectedColumn = e.target.dataset.column;
 
-            game.playRound(selectedRow, selectedColumn);
+            const msg = game.playRound(selectedRow, selectedColumn);
+            messageRoundController(msg)
             updateScreen();
         })
     };
+
+    function messageRoundController(msg) {
+        if (msg === 'This square has been marked!') window.alert(msg);
+        else return msg;
+
+    }
 
     updateScreen();
 
