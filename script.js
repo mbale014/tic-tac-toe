@@ -150,8 +150,6 @@ const gameController = (
         };
         return; //No winner outcome, undefined return
     };
-
-    let isGameOver = false;
     
     const playRound = (row, column) => {
         console.log(
@@ -207,6 +205,7 @@ const gameController = (
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
     const game = gameController;
+    let gameOverMsg;
 
     const gameBoardDiv = doc.querySelector('.game-board');
     const messageDiv = doc.querySelector('.game-message');
@@ -223,6 +222,9 @@ const screenController = (function(doc) {
 
         //Display player's turn
         messageDiv.innerText = `${activePlayer.myName()}'s move`;
+        if (gameOverMsg !== undefined) {
+            messageDiv.innerText = gameOverMsg;
+        }
 
         // Set player score board
         playerOneScoreSpan.innerText = game.getScore.playerOne();
@@ -258,9 +260,9 @@ const screenController = (function(doc) {
 
     function messageRoundController(msg) {
         if (msg === 'This square has been marked!') window.alert(msg);
-        else return msg;
+        else return gameOverMsg = msg;
 
-    }
+    };
 
     updateScreen();
 
