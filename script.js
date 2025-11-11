@@ -174,6 +174,11 @@ const gameController = (
             printNewRound();
             return msg;
         };
+
+        //Switch  player turn
+        roundCount++;
+        switchTurn();
+        printNewRound();
         
         // This where the logic for game winner check, such as win message //
         if (roundCount >= 4) {
@@ -183,18 +188,17 @@ const gameController = (
             // A game on round >= 8 and winningCheck return no winner, this means ties and games over
             if (roundCount >= 8 && winMessage === undefined) {
                 tiesScore.addScore();
-                return 'Draw!';
+                console.log('Draw!');
+                gameOver();
+                //return 'Draw!' ;
             };
 
             if (winMessage !== undefined)  {
-                return winMessage;
+                winMessage;
+                gameOver();
+                //return winMessage ;
             }
         };
-
-        //Switch  player turn
-        roundCount++;
-        switchTurn();
-        printNewRound();
 
     };
     
@@ -210,11 +214,27 @@ const gameController = (
         activePlayer = playerOne; //set active player to default
         roundCount = 0 //set round to 0
 
-        printNewRound(); //Round detail checks
+        //printNewRound(); //Round detail checks
 
     };
 
     printNewRound();
+
+    const gameOver = () => {
+        const playerInput = prompt('Do you want to continue? Y/N');
+        resetBoard();
+        roundCount = 0;
+        if (playerInput.toLowerCase() === 'y') {
+            switchTurn();
+        } else if (playerInput.toLowerCase() === 'n') {
+            console.log(`${playerOne.myName()}'s (${playerOne.myMarker()}) score: ${playerOneScore.getMyScore}`);
+            console.log(`${playerTwo.myName()}'s (${playerTwo.myMarker()}) score: ${playerTwoScore.getMyScore}`);
+            console.log(`Ties: ${tiesScore.getMyScore()}`);
+            console.log('Thanks for playing!');
+        } else {
+            console.log(`${playerInput} is not valid input. Please enter Y or N next time!`);
+        }
+    };
 
     return {
         getRoundCount,
@@ -227,6 +247,7 @@ const gameController = (
             tiesScore: tiesScore.getMyScore,
         },
         resetBoard,
+        gameOver,
     };
 })();
 
