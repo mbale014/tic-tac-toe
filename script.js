@@ -141,7 +141,6 @@ const gameController = (
         ];
 
         const flatBoard = board.printBoard().flat();
-        console.log(flatBoard);
 
         for (const combo of winningCombo) {
             const [a,b,c] = combo;
@@ -188,15 +187,11 @@ const gameController = (
             // A game on round >= 8 and winningCheck return no winner, this means ties and games over
             if (roundCount >= 8 && winMessage === undefined) {
                 tiesScore.addScore();
-                console.log('Draw!');
-                gameOver();
-                //return 'Draw!' ;
+                return 'Draw!';
             };
 
             if (winMessage !== undefined)  {
-                winMessage;
-                gameOver();
-                //return winMessage ;
+                return winMessage;
             }
         };
 
@@ -204,13 +199,16 @@ const gameController = (
     
     // To reset board, we need to set everthing to zero or null
     // This include delete mark on board, player's score, set active player to default, and rounc to zero
-    const resetBoard = () => {
+    const resetBoard = (scoreReset = true) => {
         board.resetBoard(); // reset board
 
-        const scoreList = [playerOneScore,playerTwoScore, tiesScore]
-        for (let scoreItem of scoreList) {
-            scoreItem.resetScore();
-        }; // reset scores
+        if (scoreReset) {
+            const scoreList = [playerOneScore,playerTwoScore, tiesScore]
+            for (let scoreItem of scoreList) {
+                scoreItem.resetScore();
+            }; // reset scores
+        };
+        
         activePlayer = playerOne; //set active player to default
         roundCount = 0 //set round to 0
 
@@ -220,20 +218,17 @@ const gameController = (
 
     printNewRound();
 
-    const gameOver = () => {
-        const playerInput = prompt('Do you want to continue? Y/N');
-        resetBoard();
-        roundCount = 0;
-        if (playerInput.toLowerCase() === 'y') {
-            switchTurn();
-        } else if (playerInput.toLowerCase() === 'n') {
-            console.log(`${playerOne.myName()}'s (${playerOne.myMarker()}) score: ${playerOneScore.getMyScore}`);
-            console.log(`${playerTwo.myName()}'s (${playerTwo.myMarker()}) score: ${playerTwoScore.getMyScore}`);
-            console.log(`Ties: ${tiesScore.getMyScore()}`);
-            console.log('Thanks for playing!');
+    const gameOver = (playerInput) => {
+        switchTurn();
+        
+        if (playerInput === 'end game') {
+            resetBoard(scoreReset = true); //We dont want
+            return 'thanks for playing!';
         } else {
-            console.log(`${playerInput} is not valid input. Please enter Y or N next time!`);
+            resetBoard(scoreReset = false)
+            return 'New round';
         }
+
     };
 
     return {
@@ -272,12 +267,10 @@ const screenController = (function(doc) {
         const activePlayer = game.getActivePlayer();
 
         //Display player's turn
-        if (gameOverMsg !== undefined) {
+        messageDiv.innerText = `${activePlayer.myName()}'s (${activePlayer.myMarker()}) move`;
+        if (gameOverMsg !== undefined && gameOverMsg !== 'Thanks for playing!') {
             messageDiv.innerText = gameOverMsg;
-        } else {
-            messageDiv.innerText = `${activePlayer.myName()}'s (${activePlayer.myMarker()}) move`;
         }
-        
 
         // Set player score board
         playerOneScoreSpan.innerText = game.getScore.playerOne();
@@ -313,18 +306,33 @@ const screenController = (function(doc) {
 
     function messageRoundController(msg) {
         if (msg === 'This square has been marked!') window.alert(msg);
-        else {
-            const messageText = dialogWindow.querySelector('h3');
+        else if (msg === 'Draw!' || msg?.includes('Wins!')) {
+            const messageText = dialogWindow.querySelector('h3:first-child');
             const yesBtn = dialogWindow.querySelector('#yesBtn');
+            const noBtn = dialogWindow.querySelector('#noBtn');
+
+            let playerInput = '';
             messageText.innerText = msg;
             dialogWindow.showModal();
 
             yesBtn.addEventListener('click', () => {
+                playerInput = 'continue';
+                game.gameOver(playerInput);
                 dialogWindow.close();
-                return true;
+                updateScreen();
             });
+
+            noBtn.addEventListener('click', () => {
+                gameOverMsg = 'Thanks for playing!';
+                playerInput = 'end game';
+                game.gameOver(playerInput);
+                dialogWindow.close();
+                updateScreen();
+            })
+
         };
     };
+
 
     function resetScreen() {
         const restartBtn = doc.querySelector('.restart');
