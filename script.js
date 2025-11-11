@@ -306,16 +306,24 @@ const screenController = (function(doc) {
             const selectedColumn = e.target.dataset.column;
 
             const msg = game.playRound(selectedRow, selectedColumn);
-            messageRoundController(msg)
-            dialogWindow.showModal()
+            messageRoundController(msg);
             updateScreen();
         })
     };
 
     function messageRoundController(msg) {
         if (msg === 'This square has been marked!') window.alert(msg);
-        else return gameOverMsg = msg;
+        else {
+            const messageText = dialogWindow.querySelector('h3');
+            const yesBtn = dialogWindow.querySelector('#yesBtn');
+            messageText.innerText = msg;
+            dialogWindow.showModal();
 
+            yesBtn.addEventListener('click', () => {
+                dialogWindow.close();
+                return true;
+            });
+        };
     };
 
     function resetScreen() {
@@ -335,7 +343,8 @@ const screenController = (function(doc) {
 
     return {
         clickBoardHandler,
-        resetScreen
+        resetScreen,
+        messageRoundController,
     };
 
 })(document);
