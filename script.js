@@ -173,11 +173,6 @@ const gameController = (
             printNewRound();
             return msg;
         };
-
-        //Switch  player turn
-        roundCount++;
-        switchTurn();
-        printNewRound();
         
         // This where the logic for game winner check, such as win message //
         if (roundCount >= 4) {
@@ -195,21 +190,27 @@ const gameController = (
             }
         };
 
+        //Switch  player turn
+        roundCount++;
+        switchTurn();
+        printNewRound();
+
     };
     
     // To reset board, we need to set everthing to zero or null
     // This include delete mark on board, player's score, set active player to default, and rounc to zero
-    const resetBoard = (scoreReset = true) => {
+    const resetBoard = (fullReset = true) => {
         board.resetBoard(); // reset board
 
-        if (scoreReset) {
+        // This to determine score reset if arguments passed true
+        if (fullReset) {
             const scoreList = [playerOneScore,playerTwoScore, tiesScore]
             for (let scoreItem of scoreList) {
                 scoreItem.resetScore();
             }; // reset scores
+
+            activePlayer = playerOne; //sets player active to default
         };
-        
-        activePlayer = playerOne; //set active player to default
         roundCount = 0 //set round to 0
 
         //printNewRound(); //Round detail checks
@@ -218,17 +219,11 @@ const gameController = (
 
     printNewRound();
 
-    const gameOver = (playerInput) => {
+    //When games over happens, either player continue the game or not
+    //We need to reset board and switch current turn to avoid player one keep playing first
+    const gameOver = () => {
         switchTurn();
-        
-        if (playerInput === 'end game') {
-            resetBoard(scoreReset = true); //We dont want
-            return 'thanks for playing!';
-        } else {
-            resetBoard(scoreReset = false)
-            return 'New round';
-        }
-
+        resetBoard(fullReset = false);
     };
 
     return {
@@ -242,7 +237,7 @@ const gameController = (
             tiesScore: tiesScore.getMyScore,
         },
         resetBoard,
-        gameOver,
+        gameOver
     };
 })();
 
@@ -250,14 +245,29 @@ const gameController = (
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
     const game = gameController;
-    let gameOverMsg;
+    let gameOverMsg = '';
 
     const gameBoardDiv = doc.querySelector('.game-board');
     const messageDiv = doc.querySelector('.game-message');
     const playerOneScoreSpan = doc.querySelector('.player-one > span');
     const playerTwoScoreSpan = doc.querySelector('.player-two > span');
     const tiesScoreSpan = doc.querySelector('.ties > span');
+
     const dialogWindow = doc.querySelector('.game-dialog');
+    const dialogMsg = dialogWindow.querySelector('h3:first-child');
+    const dialogMsgTwo = dialogWindow.querySelector('h3 + h3');
+    const yesBtn = dialogWindow.querySelector('#yesBtn');
+    const noBtn = dialogWindow.querySelector('#noBtn');
+
+    //Event listener Yes/ok button in dialog window
+    yesBtn.addEventListener('click', () => {
+        closeDialog();
+    });
+
+    //Event listener no/cancel button in dialog window
+    noBtn.addEventListener('click', () => {
+        closeDialog('end game');
+    })
 
     const updateScreen = () => {
         //clear the board
@@ -268,7 +278,7 @@ const screenController = (function(doc) {
 
         //Display player's turn
         messageDiv.innerText = `${activePlayer.myName()}'s (${activePlayer.myMarker()}) move`;
-        if (gameOverMsg !== undefined && gameOverMsg !== 'Thanks for playing!') {
+        if (gameOverMsg !== '') {
             messageDiv.innerText = gameOverMsg;
         }
 
@@ -295,51 +305,55 @@ const screenController = (function(doc) {
         gameBoardDiv.addEventListener('click', (e) => {
             if (!e.target.classList.contains('square-cell')) return;
 
+            //Disable click when player decide to not continue games
+            if (gameOverMsg.includes('Thanks for playing!')) return;
+
             const selectedRow = e.target.dataset.row;
             const selectedColumn = e.target.dataset.column;
 
             const msg = game.playRound(selectedRow, selectedColumn);
-            messageRoundController(msg);
+            if (msg !== undefined) {
+                messageRoundController(msg);
+            };
             updateScreen();
         })
     };
 
+    //This is to use as message controller
+    //When dialog window pop up, this function served as setting the message text 
     function messageRoundController(msg) {
-        if (msg === 'This square has been marked!') window.alert(msg);
-        else if (msg === 'Draw!' || msg?.includes('Wins!')) {
-            const messageText = dialogWindow.querySelector('h3:first-child');
-            const yesBtn = dialogWindow.querySelector('#yesBtn');
-            const noBtn = dialogWindow.querySelector('#noBtn');
-
-            let playerInput = '';
-            messageText.innerText = msg;
-            dialogWindow.showModal();
-
-            yesBtn.addEventListener('click', () => {
-                playerInput = 'continue';
-                game.gameOver(playerInput);
-                dialogWindow.close();
-                updateScreen();
-            });
-
-            noBtn.addEventListener('click', () => {
-                gameOverMsg = 'Thanks for playing!';
-                playerInput = 'end game';
-                game.gameOver(playerInput);
-                dialogWindow.close();
-                updateScreen();
-            })
-
+        if (msg === 'This square has been marked!') {
+            alert(msg);
+            return;
         };
+
+        dialogMsg.innerText = msg;
+        dialogMsgTwo.innerText = 'Continue?';
+        dialogWindow.showModal();
+
     };
 
+    // This is to use when close dialog window 
+    // If user click yes, close the dialog and reset board
+    // If user click no, same as yes but set game over msg
+    function closeDialog(action) {
+        dialogWindow.close();
 
+        game.gameOver();
+
+        if (action === 'end game') { 
+            gameOverMsg = 'Thanks for playing! \n(Press restart to play again)' ;
+        };
+        updateScreen();
+    };
+
+    // This to reset screen which includes reset board, score, and message
     function resetScreen() {
         const restartBtn = doc.querySelector('.restart');
         restartBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to restart?')) {
                 game.resetBoard();
-                gameOverMsg = undefined;
+                gameOverMsg = '';
                 updateScreen();
             }
             
@@ -352,7 +366,6 @@ const screenController = (function(doc) {
     return {
         clickBoardHandler,
         resetScreen,
-        messageRoundController,
     };
 
 })(document);
