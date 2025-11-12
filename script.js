@@ -239,12 +239,12 @@ const gameController = (
         resetBoard,
         gameOver
     };
-})();
+});
 
 
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
-    const game = gameController;
+    let game = null;
     let gameOverMsg = '';
 
     const gameBoardDiv = doc.querySelector('.game-board');
@@ -268,6 +268,16 @@ const screenController = (function(doc) {
     noBtn.addEventListener('click', () => {
         closeDialog('end game');
     })
+
+    const startGame = () => {
+        playerNamesDialog.showDialog(({P1Name, P2Name}) => {
+            //Create new game instance
+            game = gameController(P1Name, P2Name);
+
+            //Update screen UI
+            updateScreen();
+        });
+    };
 
     const updateScreen = () => {
         //clear the board
@@ -364,14 +374,61 @@ const screenController = (function(doc) {
     updateScreen();
 
     return {
+        startGame,
         clickBoardHandler,
         resetScreen,
     };
 
 })(document);
 
-screenController.clickBoardHandler()
-screenController.resetScreen()
+
+screenController.startGame();
+screenController.clickBoardHandler();
+screenController.resetScreen();
+
+const playerNamesDialog = (function (doc) {
+    const namesDialog = doc.querySelector('.player-name-dialog');
+    const namesForm = namesDialog.querySelector('#namesForm');
+    const namesInput = namesForm.querySelectorAll('.form-row input');
+    const confirmNames = namesForm.querySelector('#confirmNames');
+
+    let onSubmit = null;
+
+    const showDialog = () => {
+        onSubmit = callback;
+        namesDialog.showModal();
+    };
+        
+    const submitForm = (event) => {
+        event.preventDefault();
+
+        const playerOneName = namesInput[0].value.trim();
+        const playerTwoName = namesInput[1].value.trim();
+
+        if (!playerOneName || !playerTwoName) {
+            namesForm.reportValidity();
+            return;
+        };
+
+        namesDialog.close()
+        namesForm.reset();
+
+        onSubmit({
+            playerOneName,
+            playerTwoName
+        });
+    };
+
+    //Attach event listener to confirm button
+    confirmNames.addEventListener('click', submitForm);
+
+
+    return {
+        showDialog,
+    };
+
+})(document)
+
 
 
 
