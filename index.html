@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="game-board">
-                
+                <!-- board square goes here -->
             </div>
             <dialog class="game-dialog">
                 <h3></h3>
@@ -38,6 +38,23 @@
                     <button id="noBtn" value="cancel" formmethod="dialog" formnovalidate>No</button>
                     <button id="yesBtn" value="default">Yes</button>
                 </div>
+            </dialog>
+            <dialog class="player-name-dialog">
+                <form id="namesForm" method="dialog">
+                    <h3>Enter player's name</h3>
+                    <div class="form-row">
+                        <label for="player-one-name">Player one</label>
+                        <input type="text" id="player-one-name" name="player-one-name" placeholder="Joe"  value="Player One" pattern="[a-zA-Z0-9]+">
+                    </div>
+                    <div class="form-row">
+                        <label for="player-two">Player two</label>
+                        <input type="text" id="player-two-name" name="player-two-name" placeholder="Jane" value="Player Two" pattern="[a-zA-Z0-9]+">
+                    </div>
+                    <div class="button-dialog">
+                        <button id="confirmNames" type="submit">Start Game</button>
+                    </div>
+                    
+                </form>
             </dialog>
         </div>
         <div class="footer">
