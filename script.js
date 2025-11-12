@@ -97,9 +97,54 @@ function Score(player) {
     }
 };
 
-// gameController will be used for controlling the flow and the state of the game
+//To ask player for players name input, we need to create dialog where an input available
+// This include to send submit form to other functions
+const playerNamesDialog = (function (doc) {
+    const namesDialog = doc.querySelector('.player-name-dialog');
+    const namesForm = namesDialog.querySelector('#namesForm');
+    const namesInput = namesForm.querySelectorAll('.form-row input');
+    const confirmNames = namesForm.querySelector('#confirmNames');
 
-const gameController = (
+    let onSubmit = null;
+
+    const showDialog = (callback) => {
+        onSubmit = callback;
+        namesDialog.showModal();
+    };
+        
+    const submitForm = (event) => {
+        event.preventDefault();
+
+        //Player's name will choose based on its input, if empty it will pick default name
+        const playerOneName = namesInput[0].value.trim() || "Player One"; 
+        const playerTwoName = namesInput[1].value.trim() || "Player Two";
+
+        // if (!playerOneName || !playerTwoName) {
+        //     namesForm.reportValidity();
+        //     return;
+        // };
+
+        namesDialog.close()
+        namesForm.reset();
+
+        if (typeof(onSubmit === 'function')) {
+            onSubmit({playerOneName, playerTwoName});
+        };
+        
+    };
+
+    //Attach event listener to confirm button
+    confirmNames.addEventListener('click', submitForm);
+
+    return {
+        showDialog
+    };
+
+})(document);
+
+
+// gameController will be used for controlling the flow and the state of the game
+const gameController = 
     function (playerOneName = "Player One", playerTwoName = 'Player Two') {
         
     const board = gameBoard;
@@ -152,10 +197,10 @@ const gameController = (
 
                 if (winnerPlayer === playerOne.myMarker()) {
                     playerOneScore.addScore();
-                    return `${playerOne.myName()}'s Wins!`;
+                    return `${playerOne.myName()} Wins!`;
                 } else {
                     playerTwoScore.addScore();
-                    return `${playerTwo.myName()}'s Wins!`;
+                    return `${playerTwo.myName()} Wins!`;
                 };
             };
         };
@@ -234,23 +279,26 @@ const gameController = (
         getScore: {
             playerOne : playerOneScore.getMyScore,
             playerTwo: playerTwoScore.getMyScore,
-            tiesScore: tiesScore.getMyScore,
+            tiesScore: tiesScore.getMyScore
+        },
+        getName: {
+            playerOne: playerOne.myName,
+            playerTwo: playerTwo.myName,
         },
         resetBoard,
         gameOver
-    };
-});
+    }
+};
 
 
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
-    let game = null;
-    let gameOverMsg = '';
-
     const gameBoardDiv = doc.querySelector('.game-board');
     const messageDiv = doc.querySelector('.game-message');
-    const playerOneScoreSpan = doc.querySelector('.player-one > span');
-    const playerTwoScoreSpan = doc.querySelector('.player-two > span');
+    const playerOneNameText = doc.querySelector('.player-one > span:first-child');
+    const playerOneScoreSpan = doc.querySelector('.player-one > span:last-child');
+    const playerTwoNameText = doc.querySelector('.player-two > span:first-child');
+    const playerTwoScoreSpan = doc.querySelector('.player-two > span:last-child');
     const tiesScoreSpan = doc.querySelector('.ties > span');
 
     const dialogWindow = doc.querySelector('.game-dialog');
@@ -269,12 +317,15 @@ const screenController = (function(doc) {
         closeDialog('end game');
     })
 
-    const startGame = () => {
-        playerNamesDialog.showDialog(({P1Name, P2Name}) => {
-            //Create new game instance
-            game = gameController(P1Name, P2Name);
+    let game = null;
+    let gameOverMsg = '';
 
-            //Update screen UI
+    const startGame = () => {
+        playerNamesDialog.showDialog((names) => {
+            const {playerOneName, playerTwoName } = names;
+            //Create new game instance
+            game = gameController(playerOneName, playerTwoName);
+
             updateScreen();
         });
     };
@@ -293,7 +344,9 @@ const screenController = (function(doc) {
         }
 
         // Set player score board
+        playerOneNameText.innerText = game.getName.playerOne();
         playerOneScoreSpan.innerText = game.getScore.playerOne();
+        playerTwoNameText.innerText = game.getName.playerTwo();
         playerTwoScoreSpan.innerText = game.getScore.playerTwo();
         tiesScoreSpan.innerText = game.getScore.tiesScore();
 
@@ -316,7 +369,7 @@ const screenController = (function(doc) {
             if (!e.target.classList.contains('square-cell')) return;
 
             //Disable click when player decide to not continue games
-            if (gameOverMsg.includes('Thanks for playing!')) return;
+            if (gameOverMsg?.includes('Thanks for playing!')) return;
 
             const selectedRow = e.target.dataset.row;
             const selectedColumn = e.target.dataset.column;
@@ -366,68 +419,24 @@ const screenController = (function(doc) {
                 gameOverMsg = '';
                 updateScreen();
             }
-            
         });
-        
     };
 
-    updateScreen();
+    //startGame();
 
     return {
         startGame,
         clickBoardHandler,
-        resetScreen,
+        resetScreen
     };
 
 })(document);
 
-
-screenController.startGame();
+window.addEventListener("DOMContentLoaded", () => {
+    screenController.startGame();
+});
 screenController.clickBoardHandler();
 screenController.resetScreen();
-
-const playerNamesDialog = (function (doc) {
-    const namesDialog = doc.querySelector('.player-name-dialog');
-    const namesForm = namesDialog.querySelector('#namesForm');
-    const namesInput = namesForm.querySelectorAll('.form-row input');
-    const confirmNames = namesForm.querySelector('#confirmNames');
-
-    let onSubmit = null;
-
-    const showDialog = () => {
-        onSubmit = callback;
-        namesDialog.showModal();
-    };
-        
-    const submitForm = (event) => {
-        event.preventDefault();
-
-        const playerOneName = namesInput[0].value.trim();
-        const playerTwoName = namesInput[1].value.trim();
-
-        if (!playerOneName || !playerTwoName) {
-            namesForm.reportValidity();
-            return;
-        };
-
-        namesDialog.close()
-        namesForm.reset();
-
-        onSubmit({
-            playerOneName,
-            playerTwoName
-        });
-    };
-
-    //Attach event listener to confirm button
-    confirmNames.addEventListener('click', submitForm);
-
-
-    return {
-        showDialog,
-    };
-
-})(document)
 
 
 
