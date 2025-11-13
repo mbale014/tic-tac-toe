@@ -123,6 +123,11 @@ button.restart:hover {
   font-size: 6em;
 }
 
+.square-cell:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
 .game-dialog,
 .player-name-dialog {
   margin: auto;
@@ -131,6 +136,10 @@ button.restart:hover {
   max-width: 300px;
   max-height: 350px;
   font-size: 1em;
+}
+
+.game-dialog {
+  max-height: 200px;
 }
 
 .player-name-dialog h3 {
@@ -166,4 +175,10 @@ button.restart:hover {
   width: 50%;
   padding: 0.5em;
   font-size: 0.8em;
+}
+
+@media (max-width: 500px) {
+  .square-cell {
+    font-size: 4em;
+  }
 }
