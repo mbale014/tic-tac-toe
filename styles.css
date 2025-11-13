@@ -88,7 +88,7 @@ button.restart {
 
   border: none;
   border-radius: var(--border-radius);
-  padding: 0.5em 1.5em;
+  padding: 1vh 2vw;
 }
 
 .game-score {
@@ -99,8 +99,11 @@ button.restart {
 
 .game-board {
   border: 2px solid #333;
-  width: 35vw;
-  height: 35vw;
+  width: 90vmin;
+  height: 90vmin;
+  max-width: 500px;
+  max-height: 500px;
+  margin:0 auto;
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -112,7 +115,7 @@ button.restart {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 8em;
+  font-size: 6em;
 }
 
 .game-dialog,
@@ -128,7 +131,7 @@ button.restart {
 }
 
 .button-dialog button {
-  padding: 10px 30px;
+  padding: 10px 20px;
   border: none;
 
 }
