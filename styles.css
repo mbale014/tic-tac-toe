@@ -97,6 +97,8 @@ button.restart {
   position: absolute;
   right: 0;
 
+  background-color: var(--secondary-color);
+  color: var(--background-color);
   border: none;
   border-radius: var(--border-radius);
   padding: 0.8vh 1.5vw;
@@ -109,6 +111,7 @@ button.restart:hover {
 
 .game-score {
   display: flex;
+  align-items: center;
   border:1px solid var(--foreground-color);
   border-radius: var(--border-radius);
   margin-bottom: 2.5em;
@@ -161,6 +164,14 @@ button.restart:hover {
   cursor: pointer;
 }
 
+::backdrop {
+  background-image: linear-gradient(
+    45deg,
+    black
+  );
+  opacity: 0.5;
+}
+
 .game-dialog,
 .player-name-dialog {
   margin: auto;
@@ -169,6 +180,11 @@ button.restart:hover {
   max-width: 300px;
   max-height: 350px;
   font-size: 1em;
+  border-radius: var(--border-radius);
+  border: none;
+
+  color: var(--background-color);
+  background-color: var(--primary-color);
 }
 
 .game-dialog {
@@ -189,10 +205,15 @@ button.restart:hover {
 .button-dialog button {
   padding: 1em 2em;
   border: transparent;
+  border-radius: var(--border-radius);
+
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
 .button-dialog button:hover {
-  border: 1px solid #000;
+  background-color: var(--foreground-color);
   cursor: pointer;  
 }
 
