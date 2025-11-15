@@ -293,6 +293,7 @@ const gameController =
 
 // To control the screen by modify dom, we use IIFE as module pattern
 const screenController = (function(doc) {
+    const rootElement = doc.documentElement;
     const gameBoardDiv = doc.querySelector('.game-board');
     const messageDiv = doc.querySelector('.game-message');
     const playerOneNameText = doc.querySelector('.player-one > span:first-child');
@@ -354,16 +355,21 @@ const screenController = (function(doc) {
             row.forEach((square, idxCol) => {
                 const squareDiv = doc.createElement('div');
                 squareDiv.classList.add('square-cell');
+                const squareValue = square.getValue();
 
                 squareDiv.dataset.row = idxRow;
                 squareDiv.dataset.column = idxCol;
-                squareDiv.innerText = square.getValue();
+                squareDiv.innerText = squareValue;
+                addColor(squareValue, squareDiv);
                 gameBoardDiv.appendChild(squareDiv);
             });
         });
 
     };
 
+    //To make the board square clickable, we need to set event listener to the square element
+    //Using event delegation so we dont need setting each square one by one
+    //Each square already have its row and column dataset which its easy to modify with marker
     const clickBoardHandler = () => {
         gameBoardDiv.addEventListener('click', (e) => {
             if (!e.target.classList.contains('square-cell')) return;
@@ -381,6 +387,22 @@ const screenController = (function(doc) {
             updateScreen();
         })
     };
+
+    //This function act as color change to different marker
+    //Marker 'X' (player one) will get primary color and marker 'O' will get secondary color
+    //Color settings acquired from css variable root element
+    function addColor(value, div) {
+        const computedStyles = getComputedStyle(rootElement);
+        const primColor = computedStyles.getPropertyValue('--primary-color');
+        const secondColor = computedStyles.getPropertyValue('--secondary-color');
+
+        if (value === 'X') {
+            return div.style.color = primColor;
+        } else if (value === 'O') {
+            return div.style.color = secondColor;
+        }
+        return;
+    }
 
     //This is to use as message controller
     //When dialog window pop up, this function served as setting the message text 
