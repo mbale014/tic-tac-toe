@@ -177,6 +177,15 @@ button.restart:hover {
   font-size: 0.8em;
 }
 
+.footer {
+  padding-bottom: 0.7em;
+}
+
+.footer a {
+  text-decoration: none;
+  color: black;
+}
+
 @media (max-width: 500px) {
   .square-cell {
     font-size: 4em;
