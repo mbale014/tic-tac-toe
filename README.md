@@ -3,7 +3,7 @@ Tic tac toe game (no bot for single play now, sorry guys)
 
 ## Folder structure
 ```
-sign-up-form/
+tic-tac-toe/
 ├── README.md
 ├── index.html
 ├── styles.css
